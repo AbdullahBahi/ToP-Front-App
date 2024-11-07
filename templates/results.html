@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Installment Schedule Results</title>
+</head>
+<body>
+    <div class="container">
+        <h2>Installment Schedule</h2>
+
+        <!-- Unit Info Table -->
+        <h4>Unit Info</h4>
+        <table class="table">
+            {% for key, value in data['Unit Info'].items() %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>{{ value }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <!-- General Info Table -->
+        <h4>General Information</h4>
+        <table class="table">
+            <tr><td>Base NPV</td><td>{{ data['Base NPV'] }}</td></tr>
+            <tr><td>New NPV</td><td>{{ data['New NPV'] }}</td></tr>
+            <!-- Add other items here -->
+        </table>
+
+        <!-- Installment Schedule Table -->
+        <h4>Installments Schedule</h4>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>PMT Type</th>
+                    <th>Payment Date</th>
+                    <th>Payment Amount</th>
+                    <th>Payment Percentage</th>
+                    <th>Cumulative Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in range(data['Payment Amount']|length) %}
+                <tr>
+                    <td>{{ data['PMT Type'][i] }}</td>
+                    <td>{{ data['Payment Date'][i] }}</td>
+                    <td>{{ data['Payment Amount'][i] }}</td>
+                    <td>{{ data['Payment Percentage'][i] }}</td>
+                    <td>{{ data['Cumulative Percentage'][i] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
