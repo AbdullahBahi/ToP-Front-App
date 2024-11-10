@@ -25,22 +25,33 @@ def calculate():
     data = request.json
     # Separate input payments and other fields
     input_pmts = {
-        key:value
+        key:value/100
         for key, value in data['input_pmts'].items()
         if key.isnumeric() and value is not None
     }
 
+    if data.get('tenor_years') is None:
+        tenor_years = 0
+    else:
+        periods_per_year = data.get('tenor_years')
+
+    if data.get('periods_per_year') is None:
+        periods_per_year = 0
+    else:
+        periods_per_year = data.get('periods_per_year')
+    
     # Prepare payload with the desired structure
     payload = {
         "unit_code": data.get('unit_code'),
-        "tenor_years": data.get('tenor_years'),
-        "periods_per_year": data.get('periods_per_year'),
-        "input_pmts": input_pmts,  # Only include non-None payment values
-        "interest_rate": data.get('interest_rate'),
-        "base_dp": data.get('base_dp'),
-        "base_tenor_years": data.get('base_tenor_years'),
-        "base_periods_per_year": data.get('base_periods_per_year'),
-        "max_discount": data.get('max_discount')
+        "tenor_years": tenor_years,
+        "periods_per_year": periods_per_year,
+        "input_pmts": input_pmts,  
+        "contract_date":data.get('contract_date'),
+        # "interest_rate": data.get('interest_rate'),
+        # "base_dp": data.get('base_dp'),
+        # "base_tenor_years": data.get('base_tenor_years'),
+        # "base_periods_per_year": data.get('base_periods_per_year'),
+        # "max_discount": data.get('max_discount')
     }
     # Send a request to the API
     response = requests.post(

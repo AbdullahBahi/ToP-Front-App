@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Real Estate Installment Calculator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" /> <!-- Select2 CSS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script> <!-- Select2 JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script> <!-- SheetJS Library -->
 </head>
 <body>
@@ -25,7 +28,11 @@
             <label for="periods_per_year">Periods per Year:</label>
             <input type="number" id="periods_per_year" name="periods_per_year" min="1" required>
 
-            <label for="interest_rate">Interest Rate:</label>
+            <!-- New Contract Date field -->
+            <label for="contract_date">Contract Date:</label>
+            <input type="date" id="contract_date" name="contract_date">
+
+            <!-- <label for="interest_rate">Interest Rate:</label>
             <input type="number" id="interest_rate" name="interest_rate" min="0" max="1" step="0.01" required>
 
             <label for="base_dp">Base DP:</label>
@@ -38,7 +45,7 @@
             <input type="number" id="base_periods_per_year" name="base_periods_per_year" min="1" required>
 
             <label for="max_discount">Max Discount:</label>
-            <input type="number" id="max_discount" name="max_discount" min="0" max="1" step="0.01" required>
+            <input type="number" id="max_discount" name="max_discount" min="0" max="1" step="0.01" required> -->
 
             <button type="button" onclick="submitForm()">Calculate</button>
         </form>
@@ -54,22 +61,39 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Select2 on the unit_code dropdown
+            $('#unit_code').select2({
+                placeholder: "Select a Unit Code",
+                allowClear: true
+            });
+
             const tenorYearsInput = document.getElementById('tenor_years');
             const periodsPerYearInput = document.getElementById('periods_per_year');
             const inputPmtsContainer = document.getElementById('input_pmts_container');
+            const unitCodeSelect = document.getElementById('unit_code');
+            const searchInput = document.createElement('input');
+            const contractDateInput = document.getElementById('contract_date');
 
-            // Update input fields based on Tenor Years and Periods Per Year
             function updateInputPmts() {
                 inputPmtsContainer.innerHTML = '';
                 const tenorYears = parseInt(tenorYearsInput.value) || 0;
                 const periodsPerYear = parseInt(periodsPerYearInput.value) || 0;
                 const numPayments = tenorYears * periodsPerYear + 1;
                 const incrementDays = Math.floor(365 / periodsPerYear);
-                const today = new Date();
+
+                // Use contract date if provided, otherwise use today's date
+                
+                // Determine the start date based on the contract date or default to today
+                let startDate;
+                if (contractDateInput.value) {
+                    startDate = new Date(contractDateInput.value);
+                } else {
+                    startDate = new Date();
+                }
 
                 for (let i = 0; i < numPayments; i++) {
-                    const paymentDate = new Date(today);
-                    paymentDate.setDate(today.getDate() + i * incrementDays);
+                    const paymentDate = new Date(startDate);
+                    paymentDate.setDate(startDate.getDate() + i * incrementDays);
                     const formattedDate = paymentDate.toISOString().split('T')[0];
 
                     // Create container for each payment input with label
@@ -77,23 +101,32 @@
                     paymentContainer.className = 'payment-cell';
 
                     const label = document.createElement('label');
-                    label.textContent = `Payment ${i} - ${formattedDate}`;
+                    if (i==0){
+                        label.textContent = `Down Payment - ${formattedDate}`;
+                    }else{
+                        label.textContent = `PMT ${i} - ${formattedDate}`;
+                    }
 
                     const input = document.createElement('input');
                     input.type = 'number';
                     input.name = `input_pmts[${i}]`;
                     input.min = 0;
-                    input.max = 1;
+                    input.max = 100;
                     input.step = 0.01;
+
+                    const percentageSign = document.createElement('span');
+                    percentageSign.textContent = '%';
 
                     paymentContainer.appendChild(label);
                     paymentContainer.appendChild(input);
+                    paymentContainer.appendChild(percentageSign); // Add percentage sign after input
                     inputPmtsContainer.appendChild(paymentContainer);
                 }
             }
 
             tenorYearsInput.addEventListener('input', updateInputPmts);
             periodsPerYearInput.addEventListener('input', updateInputPmts);
+            contractDateInput.addEventListener('input', updateInputPmts); 
         });
 
         async function submitForm() {
@@ -152,25 +185,25 @@
             unitInfoHtml += `</table>`;
 
             // General Info Table
-            const generalInfoKeys = [
-                'Base NPV', 'New NPV', 'Increase/Decrease Percentage', 
-                'Price With Interest', 'Discount Rate [Per Period]', 'Maintenance Fee'
-            ];
-            let generalInfoHtml = `<h3>General Info</h3><table>`;
-            for (const key of generalInfoKeys) {
-                let displayValue = result[key];
+            // const generalInfoKeys = [
+            //     'Base NPV', 'New NPV', 'Increase/Decrease Percentage', 
+            //     'Price With Interest', 'Discount Rate [Per Period]', 'Maintenance Fee'
+            // ];
+            // let generalInfoHtml = `<h3>General Info</h3><table>`;
+            // for (const key of generalInfoKeys) {
+            //     let displayValue = result[key];
 
-                // Format accounting and percentage fields as needed
-                if (['Price With Interest', 'Maintenance Fee'].includes(key)) {
-                    displayValue = formatAccounting(displayValue);
-                }
-                if (['Base NPV', 'New NPV', 'Increase/Decrease Percentage', 'Discount Rate [Per Period]'].includes(key)) {
-                    displayValue = formatPercentage(displayValue);
-                }
+            //     // Format accounting and percentage fields as needed
+            //     if (['Price With Interest', 'Maintenance Fee'].includes(key)) {
+            //         displayValue = formatAccounting(displayValue);
+            //     }
+            //     if (['Base NPV', 'New NPV', 'Increase/Decrease Percentage', 'Discount Rate [Per Period]'].includes(key)) {
+            //         displayValue = formatPercentage(displayValue);
+            //     }
 
-                generalInfoHtml += `<tr><td>${key}</td><td>${displayValue}</td></tr>`;
-            }
-            generalInfoHtml += `</table>`;
+            //     generalInfoHtml += `<tr><td>${key}</td><td>${displayValue}</td></tr>`;
+            // }
+            // generalInfoHtml += `</table>`;
 
             // Installments Schedule Table
             const pmtTypes = result['PMT Type'];
@@ -198,7 +231,7 @@
             installmentsHtml += `</table>`;
 
             // Append all sections to the result container
-            resultContainer.innerHTML = unitInfoHtml + generalInfoHtml + installmentsHtml;
+            resultContainer.innerHTML = unitInfoHtml + installmentsHtml;
         }
 
         function exportToExcel() {
@@ -209,14 +242,14 @@
                 if (rowData.length) unitInfoData.push(rowData);
             });
 
-            const generalInfoData = [];
-            document.querySelectorAll('#resultContainer h3 + table:nth-of-type(2) tr').forEach(row => {
-                const rowData = Array.from(row.querySelectorAll('td')).map(td => td.innerText);
-                if (rowData.length) generalInfoData.push(rowData);
-            });
+            // const generalInfoData = [];
+            // document.querySelectorAll('#resultContainer h3 + table:nth-of-type(2) tr').forEach(row => {
+            //     const rowData = Array.from(row.querySelectorAll('td')).map(td => td.innerText);
+            //     if (rowData.length) generalInfoData.push(rowData);
+            // });
 
             const installmentsData = [];
-            document.querySelectorAll('#resultContainer h3 + table:nth-of-type(3) tr').forEach(row => {
+            document.querySelectorAll('#resultContainer h3 + table:nth-of-type(2) tr').forEach(row => {
                 const rowData = Array.from(row.querySelectorAll('th, td')).map(cell => cell.innerText);
                 if (rowData.length) installmentsData.push(rowData);
             });
@@ -228,8 +261,8 @@
             const unitInfoSheet = XLSX.utils.aoa_to_sheet(unitInfoData);
             XLSX.utils.book_append_sheet(workbook, unitInfoSheet, 'Unit Info');
 
-            const generalInfoSheet = XLSX.utils.aoa_to_sheet(generalInfoData);
-            XLSX.utils.book_append_sheet(workbook, generalInfoSheet, 'General Info');
+            // const generalInfoSheet = XLSX.utils.aoa_to_sheet(generalInfoData);
+            // XLSX.utils.book_append_sheet(workbook, generalInfoSheet, 'General Info');
 
             const installmentsSheet = XLSX.utils.aoa_to_sheet(installmentsData);
             XLSX.utils.book_append_sheet(workbook, installmentsSheet, 'Installments Schedule');

@@ -22,8 +22,8 @@ body {
     border: 1px solid #ddd;
     padding: 10px;
     background-color: #f9f9f9;
-    max-width: 65%; /* Prevents overlap with the form */
-    align-self: flex-start; /* Align matrix to the right */
+    max-width: 33%; /* Fit PMTs matrix to single column */
+    align-self: flex-start;
 }
 
 .payment-cell {
@@ -35,7 +35,7 @@ body {
 }
 
 .payment-cell:nth-child(even) {
-    background-color: #f2f2f2; /* Alternate row colors */
+    background-color: #f2f2f2;
 }
 
 .payment-matrix label {
@@ -43,16 +43,17 @@ body {
     font-style: italic;
     font-weight: bold;
     color: #555;
-    margin-right: 10px; /* Adds space between label and input */
+    margin-right: 10px;
     white-space: nowrap;
 }
 
 .payment-matrix input {
-    width: 100px; /* Adjust width as necessary */
+    width: 120px; /* Increase width */
     padding: 4px;
     border: 1px solid #ccc;
     border-radius: 2px;
     box-sizing: border-box;
+    margin-right: 5px;
 }
 
 form, table {
