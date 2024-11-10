@@ -12,7 +12,6 @@ def load_unit_codes():
     with open(file_path, 'r') as file:
         return [line.strip() for line in file]
 
-
 # Home route with form
 @app.route('/')
 def index():
@@ -24,12 +23,11 @@ def index():
 def calculate():
     # Extract data from JSON
     data = request.json
-
     # Separate input payments and other fields
     input_pmts = {
-        key.split('[')[-1][:-1]: value
-        for key, value in data.items()
-        if key.startswith("input_pmts[") and value is not None
+        key:value
+        for key, value in data['input_pmts'].items()
+        if key.isnumeric() and value is not None
     }
 
     # Prepare payload with the desired structure
@@ -44,18 +42,15 @@ def calculate():
         "base_periods_per_year": data.get('base_periods_per_year'),
         "max_discount": data.get('max_discount')
     }
-
     # Send a request to the API
     response = requests.post(
         'https://top-app-1h8s.onrender.com/calculate_installments',
         headers={"Content-Type": "application/json"},
         data=json.dumps(payload)
     )
-
     # Return API response to the frontend for display
     if response.status_code == 200:
-        api_data = response.json()
-        return render_template('results.html', data=api_data)
+        return jsonify(response.json())
     else:
         return jsonify({"error": "Failed to calculate installments"}), 500
 
