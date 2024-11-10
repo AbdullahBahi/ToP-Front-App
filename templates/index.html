@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real Estate Installment Calculator</title>
+    <title>Flexible ToP Calculator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" /> <!-- Select2 CSS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- jQuery -->
@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script> <!-- SheetJS Library -->
 </head>
 <body>
-    <h1>Installment Calculator</h1>
+    <h1>Flexible ToP Calculator</h1>
     <div class="input-container">
         <!-- Left Section: Static Input Fields -->
         <form id="installmentForm" class="form-section">
@@ -94,7 +94,7 @@
                 for (let i = 0; i < numPayments; i++) {
                     const paymentDate = new Date(startDate);
                     paymentDate.setDate(startDate.getDate() + i * incrementDays);
-                    const formattedDate = paymentDate.toISOString().split('T')[0];
+                    const formattedDate = paymentDate.toLocaleDateString();
 
                     // Create container for each payment input with label
                     const paymentContainer = document.createElement('div');

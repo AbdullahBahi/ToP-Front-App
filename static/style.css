@@ -1,6 +1,44 @@
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
+    background-image: url('https://wallup.net/wp-content/uploads/2018/10/05/906108-prometheus-alien-covenant-aliens-sci-fi-futuristic-adventure.jpg'); /* Replace with your image path */
+    background-size: cover;      /* Makes the image cover the entire div */
+    background-position: center; /* Centers the image within the div */
+}
+
+h1 {
+    font-size: 2.5rem;        /* Adjust size based on design */
+    font-weight: bold;        /* Make the header bold */
+    color: #2c3e50;           /* Dark shade of blue */
+    text-align: center;       /* Center align the text */
+    text-transform: uppercase; /* Makes all letters uppercase */
+    letter-spacing: 1.5px;    /* Adds spacing between letters */
+    margin: 20px 0;           /* Space above and below the header */
+    padding: 10px;            /* Padding inside the header */
+    border-bottom: 3px solid #c9c38c; /* Adds an underline border */
+    background-color: #ecf0f1; /* Light background color */
+
+    /* Sticky positioning */
+    position: sticky;
+    top: 0;           /* Sticks to the top of the viewport */
+    z-index: 1000;    /* Ensures it stays above other elements */
+}
+
+h2 {
+    font-size: 2rem;        /* Adjust size based on design */
+    font-weight: bold;        /* Make the header bold */
+    color: #2c3e50;           /* Dark shade of blue */
+    text-align: center;       /* Center align the text */
+    letter-spacing: 1.5px;    /* Adds spacing between letters */
+    margin: 20px 0;           /* Space above and below the header */
+    padding: 10px;            /* Padding inside the header */
+    border-bottom: 3px solid #c9c38c; /* Adds an underline border */
+    background-color: #ecf0f1; /* Light background color */
+
+    /* Sticky positioning */
+    position: sticky;
+    top: 0;           /* Sticks to the top of the viewport */
+    z-index: 1000;    /* Ensures it stays above other elements */
 }
 
 .input-container {
@@ -12,18 +50,22 @@ body {
 .form-section {
     flex: 1;
     max-width: 30%;
+    border: 2px solid #a5988c;
+    padding: 10px;
+    background-color: #c9c38c;
 }
 
 .payment-matrix {
     flex: 2;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    border: 1px solid #ddd;
+    gap: 2px;
+    border: 2px solid #a5988c;
     padding: 10px;
-    background-color: #f9f9f9;
-    max-width: 33%; /* Fit PMTs matrix to single column */
-    align-self: flex-start;
+    background-color: #c9c38c;
+    max-width: 55%; 
+    align-self: center;
+    margin: auto;
 }
 
 .payment-cell {
@@ -32,6 +74,8 @@ body {
     padding: 5px;
     border: 1px solid #ddd;
     background-color: #fff;
+    justify-content: center; /* Center horizontally */
+    align-items: center;     /* Center vertically */
 }
 
 .payment-cell:nth-child(even) {
@@ -45,15 +89,19 @@ body {
     color: #555;
     margin-right: 10px;
     white-space: nowrap;
+    align-self: left;
+    margin:auto;
 }
 
 .payment-matrix input {
-    width: 120px; /* Increase width */
+    width: 50%; /* Increase width */
     padding: 4px;
     border: 1px solid #ccc;
     border-radius: 2px;
     box-sizing: border-box;
     margin-right: 5px;
+    align-self: right;
+    margin:auto;
 }
 
 form, table {
@@ -70,7 +118,7 @@ label {
 }
 
 input, select {
-    width: 100%;
+    width: 65%;
     padding: 8px;
     margin-top: 5px;
 }

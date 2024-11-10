@@ -33,7 +33,7 @@ def calculate():
     if data.get('tenor_years') is None:
         tenor_years = 0
     else:
-        periods_per_year = data.get('tenor_years')
+        tenor_years = data.get('tenor_years')
 
     if data.get('periods_per_year') is None:
         periods_per_year = 0
