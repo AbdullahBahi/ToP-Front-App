@@ -16,7 +16,8 @@ def load_unit_codes():
 @app.route('/')
 def index():
     unit_codes = load_unit_codes()
-    return render_template('index.html', unit_codes=unit_codes)
+    payment_frequencies = ["Annually", "Semi-Annually", "Quarterly", "Monthly"]
+    return render_template('index.html', unit_codes=unit_codes, payment_frequencies=payment_frequencies)
 
 # Process API call and display results
 @app.route('/calculate', methods=['POST'])
@@ -35,24 +36,20 @@ def calculate():
     else:
         tenor_years = data.get('tenor_years')
 
-    if data.get('periods_per_year') is None:
-        periods_per_year = 0
+    if data.get('payment_frequency') is None:
+        payment_frequency = "quarterly"
     else:
-        periods_per_year = data.get('periods_per_year')
+        payment_frequency = data.get('payment_frequency')
     
     # Prepare payload with the desired structure
     payload = {
         "unit_code": data.get('unit_code'),
         "tenor_years": tenor_years,
-        "periods_per_year": periods_per_year,
+        "payment_frequency": payment_frequency,
         "input_pmts": input_pmts,  
-        "contract_date":data.get('contract_date'),
-        # "interest_rate": data.get('interest_rate'),
-        # "base_dp": data.get('base_dp'),
-        # "base_tenor_years": data.get('base_tenor_years'),
-        # "base_periods_per_year": data.get('base_periods_per_year'),
-        # "max_discount": data.get('max_discount')
+        "contract_date":data.get('contract_date')
     }
+    print(payload)
     # Send a request to the API
     response = requests.post(
         'https://top-app-1h8s.onrender.com/calculate_installments',

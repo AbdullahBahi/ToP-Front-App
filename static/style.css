@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
-    background-image: url('https://wallup.net/wp-content/uploads/2018/10/05/906108-prometheus-alien-covenant-aliens-sci-fi-futuristic-adventure.jpg'); /* Replace with your image path */
+    background-image: url('https://wallup.net/wp-content/uploads/2018/10/05/906108-prometheus-alien-covenant-aliens-sci-fi-futuristic-adventure.jpg'); 
     background-size: cover;      /* Makes the image cover the entire div */
     background-position: center; /* Centers the image within the div */
 }
