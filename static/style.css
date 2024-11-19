@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
-    background-image: url('https://wallup.net/wp-content/uploads/2018/10/05/906108-prometheus-alien-covenant-aliens-sci-fi-futuristic-adventure.jpg'); 
+    background-image: url('logo.png'); 
     background-size: cover;      /* Makes the image cover the entire div */
     background-position: center; /* Centers the image within the div */
 }
@@ -41,7 +41,11 @@ h2 {
     z-index: 1000;    /* Ensures it stays above other elements */
 }
 
-.input-container {
+h3 {
+    margin-left: 10px;
+}
+
+.outer-container {
     display: flex;
     justify-content: space-between; /* Add space between form and matrix */
     gap: 20px;
@@ -49,7 +53,7 @@ h2 {
 
 .form-section {
     flex: 1;
-    max-width: 30%;
+    max-width: 25%;
     border: 2px solid #a5988c;
     padding: 10px;
     background-color: #c9c38c;
@@ -62,20 +66,19 @@ h2 {
     gap: 2px;
     border: 2px solid #a5988c;
     padding: 10px;
+    margin-top: 10px;
     background-color: #c9c38c;
-    max-width: 55%; 
+    max-width: 100%; 
     align-self: center;
-    margin: auto;
 }
 
 .payment-cell {
     display: flex;
-    align-items: center;
+    justify-content: space-between; /* Ensures labels go to the left and inputs to the right */
+    align-items: center; /* Vertically centers the label and input within the cell */
     padding: 5px;
     border: 1px solid #ddd;
     background-color: #fff;
-    justify-content: center; /* Center horizontally */
-    align-items: center;     /* Center vertically */
 }
 
 .payment-cell:nth-child(even) {
@@ -89,61 +92,133 @@ h2 {
     color: #555;
     margin-right: 10px;
     white-space: nowrap;
-    align-self: left;
-    margin:auto;
+    margin-right: auto; /* Pushes the input box to the far right */
 }
 
 .payment-matrix input {
-    width: 50%; /* Increase width */
+    width: 50px;
     padding: 4px;
     border: 1px solid #ccc;
     border-radius: 2px;
     box-sizing: border-box;
-    margin-right: 5px;
-    align-self: right;
-    margin:auto;
-}
-
-form, table {
-    width: 100%;
-    margin: 20px 0;
-    border-collapse: collapse;
+    margin-right: 10px;
+    margin-left: auto; /* Pushes the input box to the far right */
 }
 
 label {
     display: block;
     margin-top: 10px;
+    margin-bottom: 10px;
     font-style: italic;    /* Italic font style */
     font-weight: bold;     /* Bold font weight */
 }
 
 input, select {
-    width: 65%;
+    width: 90%;
     padding: 8px;
-    margin-top: 5px;
 }
 
 button {
     padding: 10px 20px;
-    margin-top: 15px;
+    margin: 15px;
     cursor: pointer;
 }
 
 table, th, td {
     border: 1px solid #ddd;
     padding: 8px;
+    align-items: center;
+    max-width: 100%;
 }
 
 th {
     background-color: #f2f2f2;
-    text-align: left;
+    text-align: center;
 }
 
 #resultContainer {
     white-space: pre;
     background-color: #f9f9f9;
+    max-width: 70%; /* Already present */
     padding: 10px;
     margin-top: 20px;
     border: 1px solid #ddd;
     border-radius: 5px;
+    overflow-x: auto; /* Ensure scrolling for large content */
+    box-sizing: border-box; /* Account for padding in width calculation */
 }
+
+.unit-info-table {
+    border-collapse: collapse; /* Ensure the borders collapse into a single line */
+    width: 100%;
+    max-width: 100%;
+    margin-top: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+}
+
+.unit-info-table th, .unit-info-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.unit-info-table th {
+    background-color: #c9c38c;
+    color: #2c3e50;
+    font-weight: bold;
+    text-align: center;
+}
+
+.unit-info-table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Zebra striping */
+}
+
+.unit-info-table tr:hover {
+    background-color: #e0e0e0; /* Highlight row on hover */
+}
+
+.table-container {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    flex-wrap: wrap; /* Ensures responsiveness */
+}
+
+.table-container table {
+    flex: 1;
+    margin: 10px;
+}
+
+.installments-table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%; /* Restrict to container width */
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.installments-table th, .installments-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center; /* Center-align text */
+    vertical-align: middle; /* Vertically align text */
+    word-wrap: break-word; /* Allow header text to wrap */
+}
+
+.installments-table th {
+    background-color: #c9c38c;
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+.installments-table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Zebra striping */
+}
+
+.installments-table tr:hover {
+    background-color: #e0e0e0; /* Highlight row on hover */
+}
+
+

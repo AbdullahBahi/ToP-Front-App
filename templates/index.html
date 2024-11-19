@@ -12,7 +12,7 @@
 </head>
 <body>
     <h1>Flexible ToP Calculator</h1>
-    <div class="input-container">
+    <div class="outer-container">
         <!-- Left Section: Static Input Fields -->
         <form id="installmentForm" class="form-section">
             <label for="unit_code">Unit Code:</label>
@@ -35,16 +35,18 @@
             <!-- New Contract Date field -->
             <label for="contract_date">Contract Date:</label>
             <input type="date" id="contract_date" name="contract_date">
+            
+            <label for="input_pmts_container">Input Payments:</label>
+            <div id="input_pmts_container" class="payment-matrix"></div>
 
             <button type="button" onclick="submitForm()">Calculate</button>
         </form>
+        
+        <div id="resultContainer"></div>
 
-        <!-- Right Section: Dynamic Input Fields for Payments -->
-        <div id="input_pmts_container" class="payment-matrix"></div>
     </div>
 
-    <h2>Calculation Results</h2>
-    <div id="resultContainer"></div>
+    
 
     <button onclick="exportToExcel()">Export to Excel</button> <!-- Export button -->
 
@@ -167,8 +169,15 @@
         
             // Unit Info Table
             const unitInfo = result['Unit Info'];
-            let unitInfoHtml = `<h3>Unit Info</h3><table>`;
-            for (const [key, value] of Object.entries(unitInfo)) {
+            let unitInfoHtml = `<h3>Unit Info</h3><div class="table-container">`;
+
+            // Split the object entries into two halves
+            const entries = Object.entries(unitInfo);
+            const midpoint = Math.ceil(entries.length / 2);
+
+            // First half
+            let firstHalfHtml = `<table class="unit-info-table"><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody>`;
+            for (const [key, value] of entries.slice(0, midpoint)) {
                 let displayValue = value;
 
                 // Accounting format for specific fields
@@ -180,9 +189,30 @@
                     displayValue = formatPercentage(displayValue);
                 }
 
-                unitInfoHtml += `<tr><td>${key}</td><td>${displayValue}</td></tr>`;
+                firstHalfHtml += `<tr><td>${key}</td><td>${displayValue}</td></tr>`;
             }
-            unitInfoHtml += `</table>`;
+            firstHalfHtml += `</tbody></table>`;
+
+            // Second half
+            let secondHalfHtml = `<table class="unit-info-table"><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody>`;
+            for (const [key, value] of entries.slice(midpoint)) {
+                let displayValue = value;
+
+                // Accounting format for specific fields
+                if (['Base Price', 'Garden Area', 'Gross Area (sqm)', 'Open Terrace / Roof Area', 'Penthouse Area', 'Price With Interest'].includes(key)) {
+                    displayValue = formatAccounting(value);
+                }
+
+                if (['Maintenance Fee'].includes(key)) {
+                    displayValue = formatPercentage(displayValue);
+                }
+
+                secondHalfHtml += `<tr><td>${key}</td><td>${displayValue}</td></tr>`;
+            }
+            secondHalfHtml += `</tbody></table>`;
+
+            // Combine the two halves side by side
+            unitInfoHtml += `${firstHalfHtml}${secondHalfHtml}</div>`;
 
             // Installments Schedule Table
             const pmtTypes = result['PMT Type'];
@@ -193,8 +223,18 @@
             const maintenanceFees = result['Maintenance Fees'];
             const gasFees = result['Gas Fees'];
 
-            let installmentsHtml = `<h3>Installments Schedule</h3><table>`;
-            installmentsHtml += `<tr><th>PMT Type</th><th>Payment Date</th><th>Payment Amount</th><th>Payment Percentage</th><th>Cumulative Percentage</th><th>Maintenance Fees</th><th>Gas Fees</th></tr>`;
+            let installmentsHtml = `<h3>Installments Schedule</h3><table class="installments-table">`;
+            installmentsHtml += `<thead>
+                <tr>
+                    <th>PMT Type</th>
+                    <th>Payment Date</th>
+                    <th>Payment Amount</th>
+                    <th>Payment Percentage</th>
+                    <th>Cumulative Percentage</th>
+                    <th>Maintenance Fees</th>
+                    <th>Gas Fees</th>
+                </tr>
+            </thead><tbody>`;
 
             for (let i = 0; i < pmtTypes.length; i++) {
                 const paymentAmount = formatAccounting(paymentAmounts[i]);
@@ -213,7 +253,8 @@
                     <td>${gasFee}</td>
                 </tr>`;
             }
-            installmentsHtml += `</table>`;
+
+            installmentsHtml += `</tbody></table>`;
 
             // Append all sections to the result container
             resultContainer.innerHTML = unitInfoHtml + installmentsHtml;
