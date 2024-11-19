@@ -49,7 +49,6 @@ def calculate():
         "input_pmts": input_pmts,  
         "contract_date":data.get('contract_date')
     }
-    print(payload)
     # Send a request to the API
     response = requests.post(
         'https://top-app-1h8s.onrender.com/calculate_installments',
