@@ -96,7 +96,7 @@
                 for (let i = 0; i < numPayments; i++) {
                     const paymentDate = new Date(startDate);
                     paymentDate.setDate(startDate.getDate() + i * incrementDays);
-                    const formattedDate = paymentDate.toLocaleDateString();
+                    const formattedDate = reformatDate(paymentDate.toLocaleDateString(), "mm/dd/yyyy", "dd-mm-yyyy");
 
                     // Create container for each payment input with label
                     const paymentContainer = document.createElement('div');
@@ -159,6 +159,47 @@
             displayResult(result);
         }
 
+        function reformatDate(dateString, currentFormat, targetFormat) {
+    // Parse the input date string based on the provided currentFormat
+    const dateParts = {};
+    const formatTokens = currentFormat.split(/[-/ ]/); // Split format into tokens
+    const dateTokens = dateString.split(/[-/ ]/); // Split date into corresponding values
+
+    formatTokens.forEach((token, index) => {
+        dateParts[token.toLowerCase()] = dateTokens[index];
+    });
+
+    const year = dateParts.yyyy || dateParts.yy; // Handle "yyyy" or "yy"
+    const month = dateParts.mm || dateParts.m; // Handle "mm" or "m"
+    const day = dateParts.dd || dateParts.d; // Handle "dd" or "d"
+
+    // Create a Date object
+    const date = new Date(`${year}-${month}-${day}`);
+
+    // Extract date parts for formatting
+    const formattedYear = targetFormat.includes('yyyy') ? date.getFullYear() : String(date.getFullYear()).slice(-2);
+    const formattedMonth = targetFormat.includes('mmmm')
+        ? date.toLocaleString('en-US', { month: 'long' })
+        : targetFormat.includes('mmm')
+        ? date.toLocaleString('en-US', { month: 'short' })
+        : targetFormat.includes('mm')
+        ? String(date.getMonth() + 1).padStart(2, '0')
+        : String(date.getMonth() + 1);
+    const formattedDay = targetFormat.includes('dd') ? String(date.getDate()).padStart(2, '0') : String(date.getDate());
+
+    // Replace tokens in the target format
+    return targetFormat
+        .replace('yyyy', formattedYear)
+        .replace('yy', String(formattedYear).slice(-2))
+        .replace('mmmm', formattedMonth)
+        .replace('mmm', formattedMonth)
+        .replace('mm', String(formattedMonth).padStart(2, '0'))
+        .replace('m', formattedMonth)
+        .replace('dd', formattedDay)
+        .replace('d', formattedDay);
+}
+
+
         function displayResult(result) {
             const resultContainer = document.getElementById('resultContainer');
             resultContainer.innerHTML = ''; // Clear previous results
@@ -169,11 +210,24 @@
         
             // Unit Info Table
             const unitInfo = result['Unit Info'];
+            // Define the desired order
+            const desiredOrder = ['Project Name','Unit Code','Base Price','Delivery Date','Finishing Type','No. of Bed Rooms','Maintenance Fee','Gross Area (sqm)','Garden Area','Penthouse Area','Open Terrace / Roof Area','Project Policy'];
+
+            // Reorder the data
+            const reorderedData = {};
+            desiredOrder.forEach(key => {
+                if (key in unitInfo) {
+                    reorderedData[key] = unitInfo[key];
+                }
+            });
+            
+            reorderedData['Delivery Date'] = reformatDate(reorderedData['Delivery Date'], "mm/dd/yyyy", "dd-mm-yyyy");
+            
             let unitInfoHtml = `<h3>Unit Info</h3><div class="table-container">`;
 
             // Split the object entries into two halves
-            const entries = Object.entries(unitInfo);
-            const midpoint = Math.ceil(entries.length / 2);
+            const entries = Object.entries(reorderedData);
+            const midpoint = Math.ceil(entries.length / 2)+1;
 
             // First half
             let firstHalfHtml = `<table class="unit-info-table"><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody>`;
@@ -181,12 +235,8 @@
                 let displayValue = value;
 
                 // Accounting format for specific fields
-                if (['Base Price', 'Garden Area', 'Gross Area (sqm)', 'Open Terrace / Roof Area', 'Penthouse Area', 'Price With Interest'].includes(key)) {
+                if (['Base Price', 'Garden Area', 'Gross Area (sqm)', 'Open Terrace / Roof Area', 'Penthouse Area', 'Price With Interest', 'Maintenance Fee'].includes(key)) {
                     displayValue = formatAccounting(value);
-                }
-
-                if (['Maintenance Fee'].includes(key)) {
-                    displayValue = formatPercentage(displayValue);
                 }
 
                 firstHalfHtml += `<tr><td>${key}</td><td>${displayValue}</td></tr>`;
@@ -194,17 +244,13 @@
             firstHalfHtml += `</tbody></table>`;
 
             // Second half
-            let secondHalfHtml = `<table class="unit-info-table"><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody>`;
+            let secondHalfHtml = `<table class="unit-info-table"><thead><tr><th>Unit Areas</th><th>Value</th></tr></thead><tbody>`;
             for (const [key, value] of entries.slice(midpoint)) {
                 let displayValue = value;
 
                 // Accounting format for specific fields
-                if (['Base Price', 'Garden Area', 'Gross Area (sqm)', 'Open Terrace / Roof Area', 'Penthouse Area', 'Price With Interest'].includes(key)) {
+                if (['Base Price', 'Garden Area', 'Gross Area (sqm)', 'Open Terrace / Roof Area', 'Penthouse Area', 'Price With Interest', 'Maintenance Fee'].includes(key)) {
                     displayValue = formatAccounting(value);
-                }
-
-                if (['Maintenance Fee'].includes(key)) {
-                    displayValue = formatPercentage(displayValue);
                 }
 
                 secondHalfHtml += `<tr><td>${key}</td><td>${displayValue}</td></tr>`;
@@ -223,7 +269,7 @@
             const maintenanceFees = result['Maintenance Fees'];
             const gasFees = result['Gas Fees'];
             const deliveryRowIndex = result['delivery_payment_index']; // Index provided by backend
-
+            console.log(paymentDates[0])
             let installmentsHtml = `<h3>Installments Schedule</h3><table class="installments-table">`;
             installmentsHtml += `<thead>
                 <tr>
@@ -243,13 +289,13 @@
                 const cumulativePercentage = formatPercentage(cumulativePercentages[i]);
                 const maintenanceFee = formatAccounting(maintenanceFees[i]);
                 const gasFee = formatAccounting(gasFees[i]);
-
+                
                 // Add the highlight class to the row if it matches the deliveryRowIndex
                 const highlightClass = i === deliveryRowIndex ? 'highlight-row' : '';
 
                 installmentsHtml += `<tr class="${highlightClass}">
                     <td>${pmtTypes[i]}</td>
-                    <td>${paymentDates[i]}</td>
+                    <td>${reformatDate(paymentDates[i], "yyyy/mm/dd", "dd-mm-yyyy")}</td>
                     <td>${paymentAmount}</td>
                     <td>${paymentPercentage}</td>
                     <td>${cumulativePercentage}</td>

@@ -139,7 +139,7 @@ th {
 
 #resultContainer {
     white-space: pre;
-    background-color: #f9f9f9;
+    background-color: #f9f9f9 transparent;
     max-width: 70%; /* Already present */
     padding: 10px;
     margin-top: 20px;
