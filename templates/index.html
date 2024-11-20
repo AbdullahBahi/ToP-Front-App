@@ -222,6 +222,7 @@
             const cumulativePercentages = result['Cumulative Percentage'];
             const maintenanceFees = result['Maintenance Fees'];
             const gasFees = result['Gas Fees'];
+            const deliveryRowIndex = result['delivery_payment_index']; // Index provided by backend
 
             let installmentsHtml = `<h3>Installments Schedule</h3><table class="installments-table">`;
             installmentsHtml += `<thead>
@@ -243,7 +244,10 @@
                 const maintenanceFee = formatAccounting(maintenanceFees[i]);
                 const gasFee = formatAccounting(gasFees[i]);
 
-                installmentsHtml += `<tr>
+                // Add the highlight class to the row if it matches the deliveryRowIndex
+                const highlightClass = i === deliveryRowIndex ? 'highlight-row' : '';
+
+                installmentsHtml += `<tr class="${highlightClass}">
                     <td>${pmtTypes[i]}</td>
                     <td>${paymentDates[i]}</td>
                     <td>${paymentAmount}</td>
