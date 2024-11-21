@@ -201,6 +201,7 @@
 
 
         function displayResult(result) {
+            console.log('Love u cootie ^_^♥')
             const resultContainer = document.getElementById('resultContainer');
             resultContainer.innerHTML = ''; // Clear previous results
 
@@ -269,7 +270,7 @@
             const maintenanceFees = result['Maintenance Fees'];
             const gasFees = result['Gas Fees'];
             const deliveryRowIndex = result['delivery_payment_index']; // Index provided by backend
-            console.log(paymentDates[0])
+
             let installmentsHtml = `<h3>Installments Schedule</h3><table class="installments-table">`;
             installmentsHtml += `<thead>
                 <tr>
