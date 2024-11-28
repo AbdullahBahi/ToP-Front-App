@@ -15,10 +15,17 @@
     <div class="outer-container">
         <!-- Left Section: Static Input Fields -->
         <form id="installmentForm" class="form-section">
+            <label for="project_name">Project Name:</label>
+            <select id="project_name" name="project_name">
+                {% for project_name in unit_codes.index.unique() %}
+                    <option value="{{ project_name }}">{{ project_name }}</option>
+                {% endfor %}
+            </select>
+
             <label for="unit_code">Unit Code:</label>
             <select id="unit_code" name="unit_code">
-                {% for code in unit_codes %}
-                    <option value="{{ code }}">{{ code }}</option>
+                {% for project_name, unit_code in unit_codes.items() %}
+                    <option value="{{ unit_code }}" data-project="{{ project_name }}">{{ unit_code }}</option>
                 {% endfor %}
             </select>
 
@@ -46,25 +53,49 @@
 
     </div>
 
-    
-
     <button onclick="exportToExcel()">Export to Excel</button> <!-- Export button -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialize Select2 on the unit_code dropdown
+            // Initialize Select2 for both dropdowns
+            $('#project_name').select2({
+                placeholder: "Select Project Name",
+                allowClear: true
+            });
+
             $('#unit_code').select2({
                 placeholder: "Select a Unit Code",
                 allowClear: true
             });
 
+            const projectNameSelect = document.getElementById('project_name');
+            const unitCodeSelect = $('#unit_code'); // Select2-enhanced dropdown
+            const originalOptions = Array.from(document.getElementById('unit_code').options); // Store original options
             const tenorYearsInput = document.getElementById('tenor_years');
             const paymentFrequencySelect = document.getElementById('payment_frequency');
             const inputPmtsContainer = document.getElementById('input_pmts_container');
-            const unitCodeSelect = document.getElementById('unit_code');
             const searchInput = document.createElement('input');
             const contractDateInput = document.getElementById('contract_date');
 
+            function updateUnitCodes() {
+                const selectedProject = $('#project_name').val(); // Get the selected project
+                console.log('Selected Project:', selectedProject);
+
+                // Clear all existing options
+                unitCodeSelect.empty();
+
+                // Add only matching options from the original list
+                originalOptions.forEach(option => {
+                    if (option.dataset.project === selectedProject || !selectedProject) {
+                        // Append matching options to the Select2 dropdown
+                        unitCodeSelect.append(new Option(option.text, option.value, false, false));
+                    }
+                });
+
+                // Refresh the Select2 dropdown
+                unitCodeSelect.trigger('input');
+            }
+            
             function updateInputPmts() {
                 inputPmtsContainer.innerHTML = '';
                 const tenorYears = parseInt(tenorYearsInput.value) || 0;
@@ -126,9 +157,14 @@
                 }
             }
 
+            // Event listener for project_name dropdown
+            $('#project_name').on('input', updateUnitCodes)
+
             tenorYearsInput.addEventListener('input', updateInputPmts);
             paymentFrequencySelect.addEventListener('input', updateInputPmts);
             contractDateInput.addEventListener('input', updateInputPmts); 
+
+            updateUnitCodes();
         });
 
         async function submitForm() {
@@ -160,44 +196,44 @@
         }
 
         function reformatDate(dateString, currentFormat, targetFormat) {
-    // Parse the input date string based on the provided currentFormat
-    const dateParts = {};
-    const formatTokens = currentFormat.split(/[-/ ]/); // Split format into tokens
-    const dateTokens = dateString.split(/[-/ ]/); // Split date into corresponding values
+            // Parse the input date string based on the provided currentFormat
+            const dateParts = {};
+            const formatTokens = currentFormat.split(/[-/ ]/); // Split format into tokens
+            const dateTokens = dateString.split(/[-/ ]/); // Split date into corresponding values
 
-    formatTokens.forEach((token, index) => {
-        dateParts[token.toLowerCase()] = dateTokens[index];
-    });
+            formatTokens.forEach((token, index) => {
+                dateParts[token.toLowerCase()] = dateTokens[index];
+            });
 
-    const year = dateParts.yyyy || dateParts.yy; // Handle "yyyy" or "yy"
-    const month = dateParts.mm || dateParts.m; // Handle "mm" or "m"
-    const day = dateParts.dd || dateParts.d; // Handle "dd" or "d"
+            const year = dateParts.yyyy || dateParts.yy; // Handle "yyyy" or "yy"
+            const month = dateParts.mm || dateParts.m; // Handle "mm" or "m"
+            const day = dateParts.dd || dateParts.d; // Handle "dd" or "d"
 
-    // Create a Date object
-    const date = new Date(`${year}-${month}-${day}`);
+            // Create a Date object
+            const date = new Date(`${year}-${month}-${day}`);
 
-    // Extract date parts for formatting
-    const formattedYear = targetFormat.includes('yyyy') ? date.getFullYear() : String(date.getFullYear()).slice(-2);
-    const formattedMonth = targetFormat.includes('mmmm')
-        ? date.toLocaleString('en-US', { month: 'long' })
-        : targetFormat.includes('mmm')
-        ? date.toLocaleString('en-US', { month: 'short' })
-        : targetFormat.includes('mm')
-        ? String(date.getMonth() + 1).padStart(2, '0')
-        : String(date.getMonth() + 1);
-    const formattedDay = targetFormat.includes('dd') ? String(date.getDate()).padStart(2, '0') : String(date.getDate());
+            // Extract date parts for formatting
+            const formattedYear = targetFormat.includes('yyyy') ? date.getFullYear() : String(date.getFullYear()).slice(-2);
+            const formattedMonth = targetFormat.includes('mmmm')
+                ? date.toLocaleString('en-US', { month: 'long' })
+                : targetFormat.includes('mmm')
+                ? date.toLocaleString('en-US', { month: 'short' })
+                : targetFormat.includes('mm')
+                ? String(date.getMonth() + 1).padStart(2, '0')
+                : String(date.getMonth() + 1);
+            const formattedDay = targetFormat.includes('dd') ? String(date.getDate()).padStart(2, '0') : String(date.getDate());
 
-    // Replace tokens in the target format
-    return targetFormat
-        .replace('yyyy', formattedYear)
-        .replace('yy', String(formattedYear).slice(-2))
-        .replace('mmmm', formattedMonth)
-        .replace('mmm', formattedMonth)
-        .replace('mm', String(formattedMonth).padStart(2, '0'))
-        .replace('m', formattedMonth)
-        .replace('dd', formattedDay)
-        .replace('d', formattedDay);
-}
+            // Replace tokens in the target format
+            return targetFormat
+                .replace('yyyy', formattedYear)
+                .replace('yy', String(formattedYear).slice(-2))
+                .replace('mmmm', formattedMonth)
+                .replace('mmm', formattedMonth)
+                .replace('mm', String(formattedMonth).padStart(2, '0'))
+                .replace('m', formattedMonth)
+                .replace('dd', formattedDay)
+                .replace('d', formattedDay);
+        }
 
 
         function displayResult(result) {
@@ -212,7 +248,7 @@
             // Unit Info Table
             const unitInfo = result['Unit Info'];
             // Define the desired order
-            const desiredOrder = ['Project Name','Unit Code','No. of Bed Rooms','Finishing Type','Delivery Date','Base Price', 'Maintenance Fee','Gross Area (sqm)','Penthouse Area','Open Terrace / Roof Area','Garden Area','Project Policy'];
+            const desiredOrder = ['Project Name','Unit Code','No. of Bed Rooms','Finishing Type','Delivery Date','Base Price', 'Price With Interest', 'Maintenance Fee','Gross Area (sqm)','Penthouse Area','Open Terrace / Roof Area','Garden Area','Project Policy'];
 
             // Reorder the data
             const reorderedData = {};

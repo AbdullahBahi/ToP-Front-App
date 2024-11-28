@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 import json
+import pandas as pd
 
 app = Flask(__name__)
 
@@ -8,9 +9,11 @@ import os
 
 # Load unit codes from a text file in the same directory as app.py
 def load_unit_codes():
-    file_path = os.path.join(os.path.dirname(__file__), 'unit_codes.txt')
-    with open(file_path, 'r') as file:
-        return [line.strip() for line in file]
+    file_path = os.path.join(os.path.dirname(__file__), 'unit_codes.csv')
+    unit_codes = pd.read_csv(file_path)
+    unit_codes = unit_codes.set_index(['project_name'])
+    unit_codes = unit_codes['unit_code']
+    return unit_codes.str.strip()
 
 # Home route with form
 @app.route('/')
