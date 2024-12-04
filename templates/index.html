@@ -348,32 +348,62 @@
         }
 
         function exportToExcel() {
-            // Prepare data for each table
+            // Prepare data for Unit Info Table
             const unitInfoData = [];
-            document.querySelectorAll('#resultContainer h3 + table:nth-of-type(1) tr').forEach(row => {
-                const rowData = Array.from(row.querySelectorAll('td')).map(td => td.innerText);
-                if (rowData.length) unitInfoData.push(rowData);
-            });
+            const unitInfoTables = document.querySelectorAll('#resultContainer .table-container table'); // Get both halves
+            if (unitInfoTables.length > 1) {
+                // Add headers from the first table
+                const firstTableHeaders = Array.from(unitInfoTables[0].querySelectorAll('thead th')).map(th => th.innerText);
+                unitInfoData.push(firstTableHeaders);
 
+                // Add rows from the first table
+                unitInfoTables[0].querySelectorAll('tbody tr').forEach(row => {
+                    const rowData = Array.from(row.querySelectorAll('td')).map(td => td.innerText);
+                    unitInfoData.push(rowData);
+                });
+
+                // Add rows from the second table, assuming the headers are the same
+                unitInfoTables[1].querySelectorAll('tbody tr').forEach(row => {
+                    const rowData = Array.from(row.querySelectorAll('td')).map(td => td.innerText);
+                    unitInfoData.push(rowData);
+                });
+            }
+
+            // Prepare data for Installments Schedule Table
             const installmentsData = [];
-            document.querySelectorAll('#resultContainer h3 + table:nth-of-type(2) tr').forEach(row => {
-                const rowData = Array.from(row.querySelectorAll('th, td')).map(cell => cell.innerText);
-                if (rowData.length) installmentsData.push(rowData);
-            });
+            const installmentsTable = document.querySelector('#resultContainer .installments-table');
+            if (installmentsTable) {
+                // Add headers
+                const installmentsHeaders = Array.from(installmentsTable.querySelectorAll('thead th')).map(th => th.innerText);
+                installmentsData.push(installmentsHeaders);
+
+                // Add rows
+                installmentsTable.querySelectorAll('tbody tr').forEach(row => {
+                    const rowData = Array.from(row.querySelectorAll('td')).map(td => td.innerText);
+                    installmentsData.push(rowData);
+                });
+            }
 
             // Create a new workbook and add the data
             const workbook = XLSX.utils.book_new();
 
-            // Add each table as a separate sheet
-            const unitInfoSheet = XLSX.utils.aoa_to_sheet(unitInfoData);
-            XLSX.utils.book_append_sheet(workbook, unitInfoSheet, 'Unit Info');
+            // Add Unit Info Sheet
+            if (unitInfoData.length > 1) { // Ensure there's data (headers + at least one row)
+                const unitInfoSheet = XLSX.utils.aoa_to_sheet(unitInfoData);
+                XLSX.utils.book_append_sheet(workbook, unitInfoSheet, 'Unit Info');
+            }
 
-            const installmentsSheet = XLSX.utils.aoa_to_sheet(installmentsData);
-            XLSX.utils.book_append_sheet(workbook, installmentsSheet, 'Installments Schedule');
+            // Add Installments Schedule Sheet
+            if (installmentsData.length > 1) { // Ensure there's data (headers + at least one row)
+                const installmentsSheet = XLSX.utils.aoa_to_sheet(installmentsData);
+                XLSX.utils.book_append_sheet(workbook, installmentsSheet, 'Installments Schedule');
+            }
 
-            // Export the workbook to Excel
+            // Export the workbook to an Excel file
             XLSX.writeFile(workbook, 'Calculation_Results.xlsx');
         }
+
+
 
     </script>
 </body>
