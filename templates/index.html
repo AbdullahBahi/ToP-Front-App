@@ -39,21 +39,19 @@
                 {% endfor %}
             </select>
 
-            <!-- New Contract Date field -->
             <label for="contract_date">Contract Date:</label>
             <input type="date" id="contract_date" name="contract_date">
             
+            <button type="button" onclick="submitForm()">Calculate</button>
+            <button onclick="exportToExcel()">Export to Excel</button> <!-- Export button -->
+
             <label for="input_pmts_container">Input Payments:</label>
             <div id="input_pmts_container" class="payment-matrix"></div>
-
-            <button type="button" onclick="submitForm()">Calculate</button>
         </form>
         
         <div id="resultContainer"></div>
 
     </div>
-
-    <button onclick="exportToExcel()">Export to Excel</button> <!-- Export button -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
